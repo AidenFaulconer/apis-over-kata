@@ -86,7 +86,8 @@
     </changeSet>
 
     <changeSet author="aiden" id="7">
-        <sql dbms="postgres" endDelimiter="end" splitStatements="true" stripComments="false">
+        <validCheckSum>8:a672a6eff7b974b34ca921a63e902108</validCheckSum>
+        <createProcedure dbms="postgres">
             <comment>Create a trigger to update updated_at with now() and increment version </comment>
 
             CREATE OR REPLACE FUNCTION on_updated_trigger() RETURNS TRIGGER AS 
@@ -98,14 +99,14 @@
             END
             $$ 
             LANGUAGE plpgsql;
-        </sql>
-        <sql dbms="postgres" endDelimiter="end" splitStatements="true" stripComments="false">
+        </createProcedure>
+        <createProcedure dbms="postgres">
             <comment>Trigger previously defined trigger when UPDATE is called for actor,film,role </comment>
 
             CREATE OR REPLACE TRIGGER trigger_on_updated_trigger
             BEFORE UPDATE ON [actor, film, role]
             FOR EACH ROW EXECUTE PROCEDURE on_updated_trigger_ref()
-        </sql>
+        </createProcedure>
     </changeSet>
 
 </databaseChangeLog> 

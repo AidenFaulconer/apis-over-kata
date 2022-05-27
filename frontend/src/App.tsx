@@ -5,7 +5,6 @@ import { WebSocketLink } from "@apollo/client/link/ws"
 
 import Actors from "./pages/actors"
 
-//older **compatible with hasura**
 import { SubscriptionClient } from "subscriptions-transport-ws";
 
 
