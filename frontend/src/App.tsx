@@ -6,6 +6,9 @@ import { WebSocketLink } from "@apollo/client/link/ws"
 import Actors from "./pages/actors"
 
 import { SubscriptionClient } from "subscriptions-transport-ws";
+import { Theme } from './types/theme';
+import { useTheme, clearStore } from './store/store';
+import { setScrollbarStyles } from './store/theme';
 
 
 const wsLink = new WebSocketLink(
@@ -37,9 +40,12 @@ const client = new ApolloClient({
 });
 
 export default function App() {
+  const theme: Theme = useTheme();
   return (
     <ApolloProvider client={client} >
+      {/* <button onClick={() => clearStore()}>Clear Store</button> */}
       <div style={{
+        // ...setScrollbarStyles,
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',

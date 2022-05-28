@@ -6,6 +6,11 @@ import React, { DependencyList, useEffect } from "react";
 import { ColumnsType, DefaultRecordType } from 'rc-table/lib/interface';
 import AddActor from "../components/addactor";
 import DeleteActor from "../components/deleteactor";
+import { useStore, useTheme } from "../store/store";
+import { AppStore } from '../types/store';
+import { StateSelector } from "zustand";
+import { Theme } from "../types/theme";
+import { deepmerge } from "@mui/utils";
 
 
 const mockColumns: ColumnsType<DefaultRecordType> = [
@@ -56,74 +61,70 @@ const mockData: DefaultRecordType[] = [
     },
 ]
 
-const gridWrapperStyles: React.CSSProperties = {
-    display: 'grid',
-    gridGap: '30px',
-    height: '100%',
-    padding: '30px',
-    gridTemplateColumns: 'repeat(auto - fit, minmax(250px, 1fr))',
-    gridAutoRows: '200px',
-    gridAutoFlow: 'dense',
-}
 
 
 export default function ActorsPage() {
     const [actorData, setActorData] = React.useState({ data: mockData, columns: mockColumns });
     const { loading, error, data } = useSubscription<typeof getActorsSubscription.data>(gql(getActorsSubscription.toString()));
+    const theme: Theme = useTheme();
     const deps: DependencyList = [actorData, loading, error]
 
+    // Updating state, will trigger listeners
+    const actorsSub = useStore.subscribe((state: any) => state.users.actors)
+    const store = useStore()
+    const actors = useStore((state: any) => state?.users?.actors)
+    const setActors = useStore((state: any) => state?.actions?.setActors)
+
+
+    debugger;
+    // Unsubscribe listeners
+    // actorsSub()
 
     if (data) {
         console.log(JSON.stringify(data, null, 2))
     }
 
-
     const pageContent = React.useCallback(() =>
-        // <Masonry>
         <>
             <AddActor />
             <div
                 style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: "start",
+                    ...theme.element.variants.column,
                     boxShadow: "0px 5px 15px rgba(1,1,1,.3)",
-                    border: '1px solid rgba(1,1,1,.3)',
+                    border: theme.core.borders.primary,
                     background: 'white',
                     minHeight: '300px',
                     height: '100%',
                     position: 'relative',
                     width: 'auto',
-                    padding: '30px',
-                    borderRadius: '30px',
+                    padding: theme.core.space[4],
+                    borderRadius: theme.core.space[3],
                     overflowY: 'scroll',
                     // gridColumn: 'span 3',
                     gridRow: 'span 3',
                 }}>
                 <Table data={data?.actors} columns={actorData.columns} />
             </div>
-            {/* </Masonry> */}
         </>
         , [...deps, data])
 
     const parseServerResponse = React.useCallback((data: any, statusElement: JSX.Element) =>
         <div
             style={{
+                ...theme.element.variants.column,
                 gridColumn: 'span 2',
+                background: theme.core.colors.background,
+                padding: theme.core.space[4],
                 height: '100%',
                 minWidth: '200px',
                 gridRow: 'span 2',
-                background: 'white',
                 whiteSpace: 'pre-wrap',
                 lineBreak: 'anywhere',
-                borderRadius: '30px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                boxShadow: "0px 5px 15px rgba(1,1,1,.3)",
+                borderRadius: theme.core.space[3],
+                boxShadow: theme.core.shadows.large,
                 overflowY: 'scroll',
                 overflowX: 'hidden',
-                border: '1px solid rgba(1,1,1,.3)',
+                border: theme.core.borders.primary,
             }}>
             {statusElement}
             {JSON.stringify(data, null, 2)}
@@ -131,7 +132,7 @@ export default function ActorsPage() {
         , deps)
 
     return (
-        <div style={gridWrapperStyles}>
+        <div style={theme.element.variants.grid}>
             {
                 loading &&
                 <div>

@@ -87,26 +87,8 @@
 
     <changeSet author="aiden" id="7">
         <validCheckSum>8:4a0713cb516a03f1483e2467c9c5343c</validCheckSum>
-        <sqlFile src="./sql/create_update_trigger" dbms="postgres" stripComments="true">
-            <comment>Create a trigger to update updated_at with now() and increment version </comment>
-
-            CREATE OR REPLACE FUNCTION on_updated_trigger() RETURNS TRIGGER AS 
-            $$
-            BEGIN
-                new.updated_at := now();
-                new.version := new.version + 1;
-                return new;
-            END
-            $$ 
-            LANGUAGE plpgsql;
-        </sqlFile>
-        <sqlFile src="./sql/trigger_create_update" dbms="postgres" stripComments="true">
-            <comment>Trigger previously defined trigger when UPDATE is called for actor,film,role </comment>
-
-            CREATE OR REPLACE TRIGGER trigger_on_updated_trigger
-            BEFORE UPDATE ON actor
-            FOR EACH ROW EXECUTE PROCEDURE on_updated_trigger_ref()
-        </sqlFile>
+        <sqlFile path="${/create_update_trigger.sql}" dbms="postgres" stripComments="true"/>
+        <sqlFile path="${/trigger_create_update.sql}" dbms="postgres" stripComments="true"/>
     </changeSet>
 
 </databaseChangeLog> 
