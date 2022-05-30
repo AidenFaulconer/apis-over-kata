@@ -1,23 +1,18 @@
 import { gql, useMutation, useQuery, useSubscription } from '@apollo/client'
 
 import {
-    getActorsQuery,
     getActorsSubscription,
-    aggregateActorsRolesAndFilms,
 } from '../queries'
-import Table, { ITableComponentProps } from '../components/table'
 import React, { DependencyList, useEffect } from 'react'
 import { ColumnsType, DefaultRecordType } from 'rc-table/lib/interface'
 import AddActor from '../components/addactor'
 import DeleteActor from '../components/deleteactor'
 import { useStore, useTheme } from '../store/store'
-import { AppStore } from '../types/store'
-import { StateSelector } from 'zustand'
 import { Theme } from '../types/theme'
-import { deepmerge } from '@mui/utils'
 import SearchActor from '../components/searchActor'
 import { useDebounce, useTrackTime } from '../util'
 import ProgressLabel from 'react-progress-label'
+import MessageContainer from '../components/messenger'
 
 const mockColumns: ColumnsType<DefaultRecordType> = [
     {
@@ -127,29 +122,42 @@ export default function ActorsPage() {
                         boxShadow: theme.core.shadows.small,
                         border: theme.core.borders.primary,
                         background: 'white',
-                        minHeight: '300px',
+                        minHeight: '70vh',
                         height: '100%',
+                        width: '100%',
                         position: 'relative',
                         padding: theme.core.space[3],
                         borderRadius: theme.core.space[3],
-                        overflowY: 'scroll',
+                        overflowX: 'hidden',
+                        maxHeight: '70vh',
                         // gridColumn: 'span 3',
                     }}
                 >
-                    <nav
-                        style={{
-                            ...theme.element.variants.row,
-                            justifyContent: 'start',
-                            gap: theme.core.space[3],
-                            paddingBottom: theme.core.space[5],
-                        }}
-                    >
-                        {parseServerResponse(data, <h1>🟢</h1>)}
-                        <SearchActor />
-                        <AddActor />
-                    </nav>
-                    <Table data={results?.actors} columns={actorData.columns} />
+                    <MessageContainer data={results?.actors} />
                 </div>
+                <nav
+                    style={{
+                        ...theme.element.variants.row,
+                        boxShadow: theme.core.shadows.small,
+                        borderRadius: theme.core.space[3],
+                        background: theme.core.colors.info,
+                        width: '100%',
+                        justifyContent: 'start',
+                        padding: theme.core.space[4],
+                        gap: theme.core.space[3],
+                        maxHeight: '10vh',
+                        overflow: 'hidden',
+                        position: 'sticky',
+                        paddingBottom: theme.core.space[5],
+                    }}
+                >
+                    <textarea>
+
+                    </textarea>
+                    <button>
+                        Send Message
+                    </button>
+                </nav>
             </>
         ),
         [...deps, results, loading],

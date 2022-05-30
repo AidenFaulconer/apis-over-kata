@@ -6,7 +6,7 @@ import depeMerge from '@mui/utils/deepmerge'
 import {getActorsSubscription} from '../queries/index'
 import {gql, useSubscription} from '@apollo/client'
 import deepmerge from '@mui/utils/deepmerge'
-import { StoreActions } from '../types/store';
+import {StoreActions} from '../types/store'
 import {
     AppStore,
     Auth,
@@ -60,21 +60,38 @@ export const clearStore = () => {
 //TODO: use immer produce to reduce new state https://github.com/pmndrs/zustand
 export const useStore = create(
     // persist((set, get) => {
-  (set)=> {
+    (set) => {
         if (process.env.NODE_ENV !== 'production') {
             clearStore()
         }
         //TODO: have these actions availible through the store
         const actions: StoreActions = {
-            setAppContext: <AppStore>(newAppContext: AppStore): void => {
-                set({newAppContext})
-            },
-            setLight: <Light>(newLight: Light) =>
+            //for input states, inputs are at the top level, to hold new data, use this to modify those inputs state
+            changeFormData: function (source: string, input: any): void {
+                console.log(source,input)
+
                 set((state: AppStore) => ({
                     ...state,
-                    light: {...newLight},
-                })),
-            toggleTheme: () => {
+                    [source]: {
+                        ...state[source],
+                        ...input,
+                    },
+                }))
+                
+            },
+            //for modifying non input states
+            setAppContext: function <AppStore>(newAppContext: AppStore): void {
+                set({ newAppContext })
+            },
+            setLight: function <Light>(newLight: Light): void {
+                return set((state: AppStore) => {
+                    return ({
+                        ...state,
+                        light: { ...newLight },
+                    })
+                })
+            },
+            toggleTheme: function (): void {
                 set((state: AppStore) => ({
                     ...state,
                     theme: {
@@ -83,12 +100,13 @@ export const useStore = create(
                     },
                 }))
             },
-            setTheme: <Theme>(newTheme: Theme) =>
-                set((state: AppStore) => ({
+            setTheme: function <Theme>(newTheme: Theme): void {
+                return set((state: AppStore) => ({
                     ...state,
                     theme: newTheme,
-                })),
-            setGuest: async <Guest>(newGuest: Guest) => {
+                }))
+            },
+            setGuest: async function <Guest>(newGuest: Guest): Promise<void> {
                 set((state: AppStore) => ({
                     ...state,
                     users: {
@@ -97,7 +115,7 @@ export const useStore = create(
                     },
                 }))
             },
-            setActors: async <NewActorInput>(moreActors: NewActorInput[]) => {
+            setActors: async function <NewActorInput>(moreActors: NewActorInput[]): Promise<void> {
                 set((state: AppStore) => ({
                     ...state,
                     users: {
@@ -106,7 +124,7 @@ export const useStore = create(
                     },
                 }))
             },
-            setOnline: async <NewGuestInput>(data: NewGuestInput) => {
+            setOnline: async function <NewGuestInput>(data: NewGuestInput): Promise<void> {
                 set((state: AppStore) => ({
                     ...state,
                     messaging: {
@@ -118,7 +136,7 @@ export const useStore = create(
                     },
                 }))
             },
-            setMessages: async <NewMessageInput>(newMessage: NewMessageInput) => {
+            setMessages: async function <NewMessageInput>(newMessage: NewMessageInput): Promise<void> {
                 set((state: AppStore) => ({
                     ...state,
                     messaging: {
@@ -130,14 +148,14 @@ export const useStore = create(
                     },
                 }))
             },
-            getAuthToken: () => {
+            getAuthToken: function (): string | null {
                 return localStorage.getItem('token')
             },
         }
         //this is out model of all our apps high level business logic
-      return {
-            actions: actions,
+        return {
             saveStore,
+            actions: actions,
 
             isMobile: false,
             isTablet: false,
@@ -160,17 +178,19 @@ export const useStore = create(
                 mode: 'light',
             },
 
+            //users business logic
             users: {
-                guest: {
+                currentUser: {
                     id: null,
                     name: '',
                     email: '',
-                    avatar: '',
+                    //url to a generic user profile
+                    avatar: `https://i.pravatar.cc/${Math.round(Math.random() * 100)}`,
                     isLoading: false,
                     isLoggedIn: false,
                     isLoggedOut: false,
                 },
-                newGuestInput: {
+                newCurrentUser: {
                     id: null,
                     name: '',
                     email: '',
@@ -204,33 +224,36 @@ export const useStore = create(
                         ],
                     },
                 ],
-                newActorInput: {
-                    loading: true,
-                    error: false,
+            },
+            //hold input for generic user actions **generic to user**
+            userInput: {
+                loading: true,
+                error: false,
 
-                    id: null,
-                    firstname: '',
-                    middlename: '',
-                    lastname: '',
-                    films: [
-                        {
-                            id: null,
-                            title: '',
-                            updated_at: null,
-                            created_at: Date.now(),
-                        },
-                    ],
-                    roles: [
-                        {
-                            id: null,
-                            title: '',
-                            updated_at: null,
-                            created_at: Date.now(),
-                        },
-                    ],
-                },
+                fullname: 'search full name',
+                id: null,
+                firstname: '',
+                middlename: '',
+                lastname: '',
+                films: [
+                    {
+                        id: null,
+                        title: '',
+                        updated_at: null,
+                        created_at: Date.now(),
+                    },
+                ],
+                roles: [
+                    {
+                        id: null,
+                        title: '',
+                        updated_at: null,
+                        created_at: Date.now(),
+                    },
+                ],
             },
 
+            //messaging business logic
             messaging: {
                 isLoading: false,
 
@@ -256,16 +279,18 @@ export const useStore = create(
                         timestamp: Date.now(),
                     },
                 ],
-                newMessageInput: {
-                    body: 'Hello. 👋',
-                    user: {
-                        avatar: '🤖',
-                        name: 'Bot',
-                    },
-                    timestamp: Date.now(),
+            },
+            //message input **generic to messaging**
+            messagingInput: {
+                body: 'Hello. 👋',
+                user: {
+                    avatar: '🤖',
+                    name: 'Bot',
                 },
+                timestamp: Date.now(),
             },
 
+            //authentication
             auth: {
                 isLoading: false,
                 isLoggedIn: false,
@@ -275,9 +300,14 @@ export const useStore = create(
                 user: null,
                 error: null,
             },
+
+            //testForm 
+            testForm: {
+                someInput: '',
+            }
         }
-  }
-// ),
+    },
+    // ),
 )
 
 export const useTheme = () => {

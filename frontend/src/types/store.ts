@@ -8,9 +8,10 @@ export interface StoreActions {
     setOnline: <T>(newState: T) => void,
     setMessages: <T>(newState: T) => void,
     getAuthToken: <T>(newState: T) => void,
+    changeFormData: (source: string, input: any) => void,
 }
 
-export interface AppStore {
+export interface AppStore extends Record<string,any> {
   actions: StoreActions
   isMobile: boolean
   isTablet: boolean

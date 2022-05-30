@@ -29,6 +29,27 @@ export const aggregateActorsRolesAndFilms = query('aggregateActorsRolesAndFilms'
     ],
 })
 
+export const searchActors = query(`searchActors(
+    $firstname: String,
+    $lastname: String,
+    $middlename: String,
+)`, {
+    [alias('searchActors', `actor(
+            where: { 
+              lastname: {_ilike: $lastname}, 
+              middlename: {_ilike: $middlename}, 
+              firstname: {_ilike: $firstname}, 
+            }
+    )`)]: 
+        [{
+            id: types.number,
+            firstname: types.string,
+            lastname: types.string,
+            middlename: types.string,
+        }],
+})
+
+
 //CREATE UPDATE DELETE
 export const insertOneActor = mutation(
     `
@@ -64,6 +85,28 @@ deleteOneActor(
         [alias(
             'deleteOneActor',
             `delete_actor(
+              where: { 
+                id: {_eq: $id}, 
+              }
+            )`,
+        )]: {
+            returning: {
+                id: types.number,
+            },
+        },
+    },
+)
+
+
+export const updateOneActor = mutation(
+    `
+updateOneActor(
+  $id: uuid!, 
+)`,
+    {
+        [alias(
+            'updateOneActor',
+            `update_actor(
               where: { 
                 id: {_eq: $id}, 
               }

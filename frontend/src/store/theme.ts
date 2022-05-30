@@ -9,15 +9,16 @@ import { RootFonts, CoreTheme, Colors, ElementTheme } from '../types/theme';
 // import '@fontsource/open-sans'
 
 export const palette = {
-    primary: '#00bcd4',
-    secondary: '#ff9800',
+    primary: '#fffc',
+    secondary: '#000c',
     success: '#4caf50',
     danger: '#f44336',
     warning: '#ffeb3b',
     info: '#2196f3',
     background: '#fafafa',
     text: '#212121',
-    textSecondary: '#757575',
+    textSecondary: '#fffc',
+    textGrey: '#757575',
 };
 export const colors: Colors = {
     ...palette, 
@@ -61,7 +62,7 @@ const generateFontSizeGoldenRatio = ({ length = 9, baseFontSize = 16 }) => {
 };
 export const fonts: RootFonts = {
     fontCatagory: {
-        sans: '"Roboto", sans-serif',
+        sans: '"Inter", "Roboto", sans-serif',
         serif: 'Georgia, serif',
         monospace: '"Roboto Mono", monospace',
     },
@@ -85,7 +86,7 @@ export const fonts: RootFonts = {
 export const coreTheme: CoreTheme = {
     fonts:fonts,
     shadows: {
-        small: '0 0 4px rgba(0, 2, 15, .3)',
+        small: '0 0 7.5px rgba(0, 2, 15, .3)',
         large: '0 0 24px rgba(0, 4, 30, .6)',
     },
     borders: {
@@ -179,7 +180,10 @@ export const elementTheme: ElementTheme = {
             justifyContent: 'center',
             alignItems: "center",
             flexDirection: 'column',
-        },
+        }, 
+        // declaring a grid items as a column / row (the inverse of this)
+        //  start y / end y < spans by index x in the x direction of grid cells
+        //          ^ spans y in the y direction of grid cells
         grid: {
             display: 'grid',
             gridGap: coreTheme.space[3],
@@ -199,6 +203,8 @@ export const elementTheme: ElementTheme = {
             p: 3,
             bg: 'background',
             boxShadow: 'small',
+            display: 'flex',
+            flexDirection: 'column',
         },
         link: {
             color: coreTheme.colors.primary,
@@ -450,27 +456,4 @@ export const elementTheme: ElementTheme = {
 
     }
 };
-
-export const setScrollbarStyles = {
-    /* width */
-    "::-webkit-scrollbar": {
-    width: '20px',
-    },
-
-    /* Track */
-    "::-webkit-scrollbar-track": {
-    boxShadow: coreTheme.shadows.small,
-    borderRadius: `${coreTheme.space[0]}px`,
-    },
-    
-    /* Handle */
-    "::-webkit-scrollbar-thumb": {
-    background: "red", 
-    borderRadius: `${coreTheme.space[2]}px`,
-    },
-
-    /* Handle on hover */
-    "::-webkit-scrollbar-thumb:hover": {
-    background: coreTheme.colors.danger, 
-    },
-}
+ 

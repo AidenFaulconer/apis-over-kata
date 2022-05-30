@@ -1,8 +1,7 @@
-import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 
 import { insertOneActor } from '../../queries';
-import React, { DependencyList, useEffect } from "react";
-import { ReadonlyRecord } from 'readonly-types/dist';
+import React, { } from "react";
 import { Theme } from "../../types/theme";
 import { useTheme } from "../../store/store";
 

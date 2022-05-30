@@ -12,7 +12,9 @@ $borderRadius: 30px !default;
     line-height: 1.5;
     width: 100%;
 
+    
     table {
+
         height: 100%;
         border-spacing: 0px;
     }
@@ -171,7 +173,7 @@ $borderRadius: 30px !default;
     text-align: center;
     background: #f7f7f7;
 }
-.rc-table-header {
+.rc-table-header { 
     border: 1px solid $primaryColor;
     border-right: 0;
     border-bottom: 0;
