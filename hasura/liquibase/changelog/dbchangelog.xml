@@ -104,4 +104,38 @@
             <column name="updated_at" defaultValue="transaction_timestamp()" type="timestamp with time zone" />
         </createTable>
     </changeSet>
+
+    <changeSet author="aiden" id="9">
+
+        <createTable tableName="post">
+            <column defaultValue="gen_random_uuid ()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="message_actor_ref" references="user(id)"/>
+            </column>
+            <column name="body" type="text"/>
+            <column name="post_picture" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="timestamp" defaultValue="transaction_timestamp()" type="timestamp with time zone" />
+            <column name="updated_at" defaultValue="transaction_timestamp()" type="timestamp with time zone" />
+        </createTable>
+
+        <createTable tableName="user">
+            <column defaultValue="gen_random_uuid ()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="user_type" type="string"/>
+            <column name="user_data" type="string">
+                <constraints nullable="true" foreignKeyName="user_actor_ref" references="actor(id)"/>
+            </column>
+            <column name="bio" type="text"/>
+            <column name="profile_picture" type="text">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_at" defaultValue="transaction_timestamp()" type="timestamp with time zone" />
+            <column name="updated_at" defaultValue="transaction_timestamp()" type="timestamp with time zone" />
+        </createTable>
+    </changeSet>
 </databaseChangeLog> 

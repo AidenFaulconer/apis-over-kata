@@ -2,6 +2,8 @@
 import {query, types, alias, mutation, subscription} from 'typed-graphqlify'
 
 //GET
+
+//Actors
 export const getActorsQuery = query('GetActors', {
     [alias('actor', 'actor')]: [
         {
@@ -51,6 +53,8 @@ export const searchActors = query(
 )
 
 //CREATE UPDATE DELETE
+
+//Actors
 export const insertOneActor = mutation(
     `
 insertOneActor(
@@ -77,28 +81,6 @@ insertOneActor(
     },
 )
 
-export const insertOneMessage = mutation(
-    `
-insertOneMesssage(
-  $senderId: uuid!,
-  $body: String!, 
-)`,
-    {
-        [alias(
-            'insertOneMessage',
-            `insert_message_one(
-              object: {
-                actor_id: $senderId, 
-                body: $body,  
-              }
-            )`,
-        )]: { 
-                actor_id: types.number,
-                body: types.string, 
-        },
-    },
-)
-
 export const deleteOneActor = mutation(
     `
 deleteOneActor(
@@ -108,27 +90,6 @@ deleteOneActor(
         [alias(
             'deleteOneActor',
             `delete_actor(
-              where: { 
-                id: {_eq: $id}, 
-              }
-            )`,
-        )]: {
-            returning: {
-                id: types.number,
-            },
-        },
-    },
-)
-
-export const deleteOneMessage = mutation(
-    `
-deleteOneMessgae(
-  $id: uuid!, 
-)`,
-    {
-        [alias(
-            'deleteOneMessgae',
-            `delete_message(
               where: { 
                 id: {_eq: $id}, 
               }
@@ -162,7 +123,61 @@ updateOneActor(
     },
 )
 
+//Messages
+export const insertOneMessage = mutation(
+    `
+insertOneMesssage(
+  $senderId: uuid!,
+  $body: String!, 
+)`,
+    {
+        [alias(
+            'insertOneMessage',
+            `insert_message_one(
+              object: {
+                actor_id: $senderId, 
+                body: $body,  
+              }
+            )`,
+        )]: { 
+                actor_id: types.number,
+                body: types.string, 
+        },
+    },
+)
+
+export const deleteOneMessage = mutation(
+    `
+deleteOneMessgae(
+  $id: uuid!, 
+)`,
+    {
+        [alias(
+            'deleteOneMessgae',
+            `delete_message(
+              where: { 
+                id: {_eq: $id}, 
+              }
+            )`,
+        )]: {
+            returning: {
+                id: types.number,
+            },
+        },
+    },
+)
+
+
+//Posts
+
+
+
+//Authentication
+
+
 //SUBSCRIPTIONS
+
+//Actors
 export const getActorsSubscription = subscription('SubscribeToActor', {
     [alias('actors', 'actor')]: [
         {
@@ -175,8 +190,26 @@ export const getActorsSubscription = subscription('SubscribeToActor', {
         },
     ],
 })
+
+//Messaging
 export const getMessagesSubscription = subscription('SubscribeToMessages', {
     [alias('messages', 'message')]: [
+        {
+            body: types.string,
+            timestamp: types.string,
+            id: types.number,
+            // reactions: types.string,
+            actor: {
+                firstname: types.string,
+                id: types.number,
+            },
+        },
+    ],
+})
+
+//Posts
+export const getPostsSubscription = subscription('SubscribeToPosts', {
+    [alias('posts', 'message')]: [
         {
             body: types.string,
             timestamp: types.string,

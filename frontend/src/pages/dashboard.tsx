@@ -170,7 +170,7 @@ export default function ActorsPage() {
                     lineBreak: 'anywhere',
                     borderRadius: theme.core.space[3],
                     boxShadow: theme.core.shadows.small,
-                    // overflowY: 'scroll',
+                    overflowY: 'scroll',
                     overflowX: 'hidden',
                     border: theme.core.borders.primary,
                 }}

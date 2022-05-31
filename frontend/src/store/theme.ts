@@ -386,6 +386,7 @@ export const elementTheme: ElementTheme = {
         },
         img: {
             objectFit: 'cover',
+            backgroundSize: 'cover',
             maxWidth: '100%',
             height: 'auto',
         },

@@ -9,6 +9,8 @@ import AddReaction from './addreaction';
 //https://table-react-component.vercel.app/demo/animation
 export default function MessageContainer({ data }: { [key: string]: any }) {
     const theme: Theme = useTheme();
+
+    const [isOpen, setIsOpen] = React.useState(-1);
     console.log(data)
 
     //method to sort an array of objects with a timestamp field, containing a data, in ascending order
@@ -19,7 +21,6 @@ export default function MessageContainer({ data }: { [key: string]: any }) {
     return (
         <div
             style={{
-                border: theme.core.borders.primary,
                 ...theme.element.variants.column,
                 gap: theme.core.space[1],
                 width: '100%',
@@ -28,7 +29,7 @@ export default function MessageContainer({ data }: { [key: string]: any }) {
                 overflowY: 'scroll',
             }}
         >
-            {data?.sort(sortByTimestamp).map((message: any) => (
+            {data?.sort(sortByTimestamp).map((message: any, index: number) => (
                 <div
                     style={{
                         // overflow: 'scroll',
@@ -64,9 +65,24 @@ export default function MessageContainer({ data }: { [key: string]: any }) {
                                 right: -theme.core.space[4],
                                 ...theme.element.variants.row,
                             }}>
-                                <div>
-                                    🙂➕
-                                    {true || <AddReaction messageId={message?.id} />}
+                                <div onClick={() => isOpen === index ? setIsOpen(-1) : setIsOpen(index)}>
+                                    🙂
+                                    {index === isOpen &&
+                                        <div
+                                            // onClick={() => setIsOpen(-1)}
+                                            style={{
+                                                background: theme.core.colors.background,
+                                                boxShadow: theme.core.shadows.large,
+                                                borderRadius: theme.core.space[3],
+                                                position: 'absolute',
+                                                top: -theme.core.space[2],
+                                                left: 0,
+                                                zIndex: 20,
+                                                ...theme.element.variants.row,
+                                            }}>
+                                            <AddReaction messageId={message?.id} />
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </p>
@@ -82,7 +98,8 @@ export default function MessageContainer({ data }: { [key: string]: any }) {
                                 border: theme.core.borders.primary,
                                 borderRadius: '100%',
                                 backgroundImage: `url('https://randomuser.me/api/portraits/men/76.jpg')`,
-                                objectFit: 'cover',
+                                backgroundSize: 'cover',
+
                                 //fit background image
                                 backgroundPosition: 'center',
                             }} />
@@ -97,8 +114,9 @@ export default function MessageContainer({ data }: { [key: string]: any }) {
                         <DeleteMessage messageId={message?.id} />
                     </div>
 
-                </div>
-            ))}
+                </div >
+            ))
+            }
         </div >
     );
 }

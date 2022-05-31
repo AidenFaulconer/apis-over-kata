@@ -301,11 +301,14 @@ export const useStore = create(
                 user: null,
                 error: null,
             },
-
-            //testForm 
-            testForm: {
-                someInput: '',
-            }
+            loginInput: {
+                username: 'username',
+                password: 'password',
+                confirmPassword: '',
+                profilePhoto: 'https://i.pravatar.cc/30',
+                bio: 'Write a short bio about yourself',
+                userType: 'actor',
+            },
         }
     },
     // ),

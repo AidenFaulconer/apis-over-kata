@@ -43,7 +43,10 @@ export default function AddReaction({ messageId }: { messageId: string }): JSX.E
             ) : (
                 <span>No emoji Chosen</span>
             )}
-            <Picker onEmojiClick={onEmojiClick} />
+            <Picker
+                onEmojiClick={onEmojiClick}
+                native={true}
+            />
         </div >
     );
 };

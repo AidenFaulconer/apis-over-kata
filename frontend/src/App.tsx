@@ -8,14 +8,19 @@ import Messenger from "./pages/messager"
 
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import { Theme } from './types/theme';
-import { useTheme, clearStore } from './store/store';
+import { useTheme, clearStore, useStore } from './store/store';
 import Layout from './layout';
+import Login from './pages/login';
+import Register from './pages/register';
+import Dashboard from './pages/dashboard';
 
-import { Route, Router, Routes, Link, BrowserRouter } from 'react-router-dom';
+import { Route, Router, Routes, Link, BrowserRouter, useOutlet, Outlet, Navigate, useLocation } from 'react-router-dom';
+
 
 import { unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import { wrapHistory } from "oaf-react-router";
+import { useFormStore } from './util/index';
 
 const history = createBrowserHistory(); // or createHashHistory()
 const settings = {
@@ -70,8 +75,24 @@ const client = new ApolloClient({
   },
 });
 
+//https://stackoverflow.com/questions/70358626/redirect-in-react-router-dom-v6
+const PrivateRoute = ({ ...props }): JSX.Element => {
+  const location = useLocation();
+  return props.isLoggedIn ? (
+    <Outlet />
+  ) : (
+    <Navigate
+      to={`/login/${location.search}`}
+      replace
+      state={{ location }}
+    />
+  )
+};
+
 export default function App() {
   const theme: Theme = useTheme();
+  const isLoggedIn = useStore((state: any) => state.auth.isLoggedIn)
+
   return (
     <ApolloProvider client={client} >
       <HistoryRouter history={history}>
@@ -87,15 +108,32 @@ export default function App() {
             width: '100%',
           }}>
             <Routes>
-              <Route path="/" caseSensitive={false} element={
-                <Link to="./actors">Get Started</Link>
+              <Route path="/login" caseSensitive={false} element={
+                <Login />
               } />
-              <Route path="actors" element={
-                <Actors />
+
+              <Route path="/register" caseSensitive={false} element={
+                <Register />
               } />
-              <Route path="messenger" element={
-                <Messenger />
-              } />
+
+              <Route path="dashboard" caseSensitive={false} element={
+                <PrivateRoute isLoggedIn={isLoggedIn} />
+              }>
+                <Route path="dashboard" element={<Dashboard />} />
+              </Route>
+
+              <Route path="actors" caseSensitive={false} element={
+                <PrivateRoute isLoggedIn={isLoggedIn} />
+              }>
+                <Route path="actors" element={<Actors />} />
+              </Route>
+
+              <Route path="messenger" caseSensitive={false} element={
+                <PrivateRoute isLoggedIn={isLoggedIn} />
+              }>
+                <Route path="actors" element={<Messenger />} />
+              </Route>
+
             </Routes>
           </div>
         </Layout>
