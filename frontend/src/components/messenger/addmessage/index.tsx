@@ -15,9 +15,7 @@ export default function AddActor(): JSX.Element {
     const theme: Theme = useTheme();
     return (
         <div style={{
-            ...theme.element.variants.column,
-            padding: theme.core.space[3],
-            background: theme.core.colors.background,
+            ...theme.element.variants.row,
             whiteSpace: 'pre-wrap',
             lineBreak: 'anywhere',
             borderRadius: theme.core.space[3],
@@ -25,17 +23,18 @@ export default function AddActor(): JSX.Element {
             height: '100%',
             alignItems: 'center',
             gap: theme.core.space[4],
-            boxShadow: theme.core.shadows.small,
-            border: theme.core.borders.primary,
             color: theme.core.colors.text,
+            justifyContent: 'start',
         }}>
             <form className="formInput"
                 style={{
-                    ...theme.element.variants.column,
+                    ...theme.element.variants.row,
                     gap: theme.core.space[2],
+                    width: '50%',
+                    height: '100%',
                 }}
             >
-                <input
+                {/* <input
                     className="input"
                     style={{
                         borderRadius: '30px',
@@ -44,12 +43,17 @@ export default function AddActor(): JSX.Element {
                     placeholder="first name"
                     value={newSenderId}
                     onChange={e => setSenderId(e.target.value)}
-                />
+                /> */}
                 <textarea
                     className="input"
                     style={{
-                        borderRadius: theme.core.space[1],
+                        borderRadius: theme.core.space[2],
                         padding: theme.core.space[2],
+                        boxShadow: `inset ${theme.core.shadows.small}`,
+                        minHeight: '100px',
+                        minWidth: '350px',
+                        width: '100%',
+                        height: '100%',
                     }}
                     placeholder="first name"
                     value={newMessageInput}

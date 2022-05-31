@@ -128,7 +128,7 @@ deleteOneMessgae(
     {
         [alias(
             'deleteOneMessgae',
-            `delete_messgae(
+            `delete_message(
               where: { 
                 id: {_eq: $id}, 
               }
@@ -180,8 +180,11 @@ export const getMessagesSubscription = subscription('SubscribeToMessages', {
         {
             body: types.string,
             timestamp: types.string,
+            id: types.number,
+            // reactions: types.string,
             actor: {
                 firstname: types.string,
+                id: types.number,
             },
         },
     ],

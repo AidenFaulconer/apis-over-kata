@@ -70,7 +70,10 @@ export default function ActorsPage(): JSX.Element {
                 <div
                     style={{
                         ...theme.element.variants.column,
-                        boxShadow: theme.core.shadows.small,
+                        flexDirection: 'column-reverse',
+                        justifyContent: 'start',
+                        alignItems: 'center',
+                        boxShadow: `inset ${theme.core.shadows.small}`,
                         border: theme.core.borders.primary,
                         background: 'white',
                         maxHeight: '60vh',

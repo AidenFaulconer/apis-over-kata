@@ -6,36 +6,29 @@ import { ReadonlyRecord } from 'readonly-types/dist';
 import { Theme } from "../../../types/theme";
 import { useTheme } from "../../../store/store";
 
-export interface IDeleteActorComponentProps {
-    actorId: string
-}
-
-export default function DeleteActor({ actorId }: IDeleteActorComponentProps) {
+export default function DeleteActor({ messageId }: { messageId: string }): JSX.Element {
 
     const [messageInput, setMessageInput] = React.useState('full name');
-    const [removeActor] = useMutation<typeof deleteOneMessage.data>(gql(deleteOneMessage.toString()));
+    const [removeMessage] = useMutation<typeof deleteOneMessage.data>(gql(deleteOneMessage.toString()));
     const theme: Theme = useTheme();
 
 
-    if (actorId) {
+    if (messageId) {
         return (
             <button
                 onClick={(e) => {
                     e.preventDefault();
-                    alert(`you sent: ${JSON.stringify({ id: actorId, }, null, 2)}`)
-                    removeActor({ variables: { id: actorId, } });
+                    alert(`you sent: ${JSON.stringify({ id: messageId, }, null, 2)}`)
+                    removeMessage({ variables: { id: messageId, } });
                 }}
                 style={{
-                    borderRadius: theme.core.space[2],
-                    padding: theme.core.space[3],
-                    background: theme.core.colors.danger,
+                    border: 'none',
+                    background: 'inherit',
+                    color: theme.core.colors.danger,
                     cursor: 'pointer',
-                    color: 'white',
-                    border: theme.core.borders.primary,
-                    boxShadow: "0px 2.5px 7.5px crimson",
                 }}
             >
-                ☠️ Delete
+                ☠️ Delete Message
             </button>
         );
     }
@@ -68,8 +61,8 @@ export default function DeleteActor({ actorId }: IDeleteActorComponentProps) {
             <button
                 onClick={(e) => {
                     e.preventDefault();
-                    alert(`you sent: ${JSON.stringify({ body: messageInput }, null, 2)}`)
-                    removeActor({ variables: { body: messageInput } });
+                    alert(`you sent: ${JSON.stringify({ id: messageInput }, null, 2)}`)
+                    removeMessage({ variables: { id: messageInput } });
                 }}
                 style={{
                     border: theme.core.borders.secondary,
@@ -80,7 +73,7 @@ export default function DeleteActor({ actorId }: IDeleteActorComponentProps) {
                     color: 'white',
                 }}
             >
-                Delete Actor ❌
+                Delete Message ❌
             </button>
         </div>
         );
