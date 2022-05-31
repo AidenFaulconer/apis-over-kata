@@ -1,33 +1,18 @@
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 
-import { insertOneActor } from '../../queries';
+import { insertOneMessage } from '../../../queries';
 import React, { DependencyList, useEffect } from "react";
 import { ReadonlyRecord } from 'readonly-types/dist';
-import { Theme } from "../../types/theme";
-import { useTheme } from "../../store/store";
+import { Theme } from "../../../types/theme";
+import { useTheme } from "../../../store/store";
+import { useFormStore } from '../../../util/index';
 
 export default function AddActor(): JSX.Element {
 
-    const [actorInput, setActorInput] = React.useState('full name');
-
-    const [formInput, setFormInput] = React.useState({
-        firstname: '',
-        middlename: '',
-        lastname: '',
-        films: [{}],
-        roles: [{}],
-    });
-    const [addActor] = useMutation<typeof insertOneActor.data>(gql(insertOneActor.toString()));
+    const [newMessageInput, setFormInput, inputError] = useFormStore('messageInput', 'body', true, 'textArea')
+    const [newSenderId, setSenderId, senderInputError] = useFormStore('messageInput', 'senderId', true, 'textArea')
+    const [sendMessage] = useMutation<typeof insertOneMessage.data>(gql(insertOneMessage.toString()));
     const theme: Theme = useTheme();
-
-    const partsOfName = ['firstname', 'middlename', 'lastname']
-    const processInput = (input: string) => input.split(' ').reduce(
-        (acc, namePart, index): object => ({
-            ...acc,
-            [partsOfName[index]]: namePart
-        }), {}
-    )
-
     return (
         <div style={{
             ...theme.element.variants.column,
@@ -53,23 +38,35 @@ export default function AddActor(): JSX.Element {
                 <input
                     className="input"
                     style={{
+                        borderRadius: '30px',
+                        padding: '7.5px',
+                    }}
+                    placeholder="first name"
+                    value={newSenderId}
+                    onChange={e => setSenderId(e.target.value)}
+                />
+                <textarea
+                    className="input"
+                    style={{
                         borderRadius: theme.core.space[1],
                         padding: theme.core.space[2],
                     }}
                     placeholder="first name"
-                    value={actorInput}
-                    onChange={e => setActorInput(e.target.value)}
+                    value={newMessageInput}
+                    onChange={e => {
+                        setFormInput(e.target.value)
+                    }}
                 />
             </form>
             <button
                 onClick={(e) => {
                     e.preventDefault();
-                    alert(`you sent: ${JSON.stringify(processInput(actorInput), null, 2)}`)
-                    addActor({ variables: processInput(actorInput) });
+                    alert(`you sent: ${JSON.stringify({ "body": newMessageInput, "senderId": newSenderId }, null, 2)}`)
+                    sendMessage({ variables: { "body": newMessageInput, "senderId": newSenderId } });
                 }}
-                disabled={actorInput.split(' ').length < 3}
+                disabled={newMessageInput.length < 5}
                 style={{
-                    ...actorInput.split(' ').length < 3 ? { opacity: .3 } : { opacity: 1 },
+                    ...newMessageInput.length < 5 ? { opacity: .3 } : { opacity: 1 },
                     borderRadius: theme.core.space[1],
                     padding: theme.core.space[3],
                     background: theme.core.colors.success,
@@ -78,7 +75,7 @@ export default function AddActor(): JSX.Element {
                     boxShadow: "0px 2.5px 7.5px green",
                 }}
             >
-                💃 Add Actor
+                💬 Send Message
             </button>
         </div>
     );

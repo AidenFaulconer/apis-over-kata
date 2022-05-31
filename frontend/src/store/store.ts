@@ -281,8 +281,9 @@ export const useStore = create(
                 ],
             },
             //message input **generic to messaging**
-            messagingInput: {
+            messageInput: {
                 body: 'Hello. 👋',
+                senderId: 'b4b2752d-e5d5-4973-befa-e5b94822629f',
                 user: {
                     avatar: '🤖',
                     name: 'Bot',

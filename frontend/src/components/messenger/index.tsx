@@ -7,6 +7,7 @@ import { useTheme } from '../../store/store';
 //https://table-react-component.vercel.app/demo/animation
 export default function MessageContainer({ data }: { [key: string]: any }) {
     const theme: Theme = useTheme();
+    console.log(data)
     return (
         <div
             style={{
@@ -17,7 +18,7 @@ export default function MessageContainer({ data }: { [key: string]: any }) {
                 justifyContent: 'start',
             }}
         >
-            {data?.map((message: any) => {
+            {data?.sort((a: any, b: any) => a.timestamp - b.timestamp).map((message: any) => {
                 return (
                     <div
                         style={{
@@ -38,16 +39,19 @@ export default function MessageContainer({ data }: { [key: string]: any }) {
                                 maxHeight: 50,
                                 height: '50px',
                                 width: '50px',
+                                color: theme.core.colors.text,
                                 background: theme.core.colors.background,
                                 border: theme.core.borders.primary,
                                 boxShadow: theme.core.shadows.small,
                                 borderRadius: '100%',
                                 backgroundImage: `url('https://randomuser.me/api/portraits/men/70.jpg')`
                             }} />
-                        <p>{data?.firstname}</p>
-                        <p>{data?.middlename}</p>
-                        <p>{data?.lastname}</p>
-                        <p>{data?.body || 'I"m a robot 🤖'}</p>
+                        <b style={{
+                            textTransform: 'capitalize'
+                        }}>
+                            {`${message?.actor?.firstname}:`}
+                        </b>
+                        <p>{message?.body}</p>
                     </div>
                 )
             })}

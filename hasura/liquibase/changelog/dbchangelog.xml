@@ -87,8 +87,21 @@
 
     <changeSet author="aiden" id="7">
         <validCheckSum>8:4a0713cb516a03f1483e2467c9c5343c</validCheckSum>
-        <sqlFile path="${/create_update_trigger.sql}" dbms="postgres" stripComments="true"/>
-        <sqlFile path="${/trigger_create_update.sql}" dbms="postgres" stripComments="true"/>
+        <sqlFile path="/create_update_trigger.sql" dbms="postgres" stripComments="true"/>
+        <sqlFile path="/trigger_create_update.sql" dbms="postgres" stripComments="true"/>
     </changeSet>
 
+    <changeSet author="aiden" id="8">
+        <createTable tableName="message">
+            <column defaultValue="gen_random_uuid ()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="actor_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="message_actor_ref" references="actor(id)"/>
+            </column>
+            <column name="body" type="text"/>
+            <column name="timestamp" defaultValue="transaction_timestamp()" type="timestamp with time zone" />
+            <column name="updated_at" defaultValue="transaction_timestamp()" type="timestamp with time zone" />
+        </createTable>
+    </changeSet>
 </databaseChangeLog> 

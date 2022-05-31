@@ -13,54 +13,9 @@ import SearchActor from '../components/searchActor'
 import { useDebounce, useTrackTime } from '../util'
 import ProgressLabel from 'react-progress-label'
 import MessageContainer from '../components/messenger'
+import { getMessagesSubscription } from '../queries';
+import AddMessage from '../components/messenger/addmessage';
 
-const mockColumns: ColumnsType<DefaultRecordType> = [
-    {
-        title: 'Actions',
-        dataIndex: 'id',
-        key: 'id',
-        render: (text: string): JSX.Element => <DeleteActor actorId={text} />,
-        width: '100px',
-    },
-    {
-        title: 'id',
-        dataIndex: 'id',
-        key: 'id',
-        width: '150px',
-    },
-    {
-        title: 'firstname',
-        dataIndex: 'firstname',
-        width: '150px',
-        key: 'firstname',
-    },
-    {
-        title: 'lastname',
-        width: '150px',
-        dataIndex: 'lastname',
-        key: 'lastname',
-    },
-    {
-        title: 'middlename',
-        dataIndex: 'middlename',
-        width: '150px',
-        key: 'middlename',
-    },
-    {
-        title: 'version',
-        dataIndex: 'version',
-        width: '50px',
-        key: 'version',
-    },
-]
-
-const mockData: DefaultRecordType[] = [
-    {
-        firstname: 'firstname',
-        lastname: 'lastname',
-        middlename: 'middlename',
-    },
-]
 
 export const LoadingProgress = ({ speed = 1 }: { [key: string]: number }): JSX.Element => {
     //input a progress value that is a continuous sin from 0 100
@@ -71,7 +26,6 @@ export const LoadingProgress = ({ speed = 1 }: { [key: string]: number }): JSX.E
 
         return result
     })
-
 
     console.log(progress)
     const theme: Theme = useTheme()
@@ -91,13 +45,10 @@ export const LoadingProgress = ({ speed = 1 }: { [key: string]: number }): JSX.E
     )
 }
 
-export default function ActorsPage() {
-    const [actorData, setActorData] = React.useState({
-        data: mockData,
-        columns: mockColumns,
-    })
-    const { loading, error, data } = useSubscription<typeof getActorsSubscription.data>(
-        gql(getActorsSubscription.toString()),
+export default function ActorsPage(): JSX.Element {
+    const [actorData, setActorData] = React.useState({})
+    const { loading, error, data } = useSubscription<typeof getMessagesSubscription.data>(
+        gql(getMessagesSubscription.toString()),
     )
     const results = useDebounce(data, 250)
     const theme: Theme = useTheme()
@@ -122,42 +73,18 @@ export default function ActorsPage() {
                         boxShadow: theme.core.shadows.small,
                         border: theme.core.borders.primary,
                         background: 'white',
-                        minHeight: '70vh',
+                        maxHeight: '60vh',
                         height: '100%',
                         width: '100%',
                         position: 'relative',
                         padding: theme.core.space[3],
                         borderRadius: theme.core.space[3],
                         overflowX: 'hidden',
-                        maxHeight: '70vh',
-                        // gridColumn: 'span 3',
                     }}
                 >
-                    <MessageContainer data={results?.actors} />
+                    <MessageContainer data={results?.messages} />
                 </div>
-                <nav
-                    style={{
-                        ...theme.element.variants.row,
-                        boxShadow: theme.core.shadows.small,
-                        borderRadius: theme.core.space[3],
-                        background: theme.core.colors.info,
-                        width: '100%',
-                        justifyContent: 'start',
-                        padding: theme.core.space[4],
-                        gap: theme.core.space[3],
-                        maxHeight: '10vh',
-                        overflow: 'hidden',
-                        position: 'sticky',
-                        paddingBottom: theme.core.space[5],
-                    }}
-                >
-                    <textarea>
-
-                    </textarea>
-                    <button>
-                        Send Message
-                    </button>
-                </nav>
+                <AddMessage />
             </>
         ),
         [...deps, results, loading],
@@ -195,8 +122,9 @@ export default function ActorsPage() {
             style={{
                 ...theme.element.variants.row,
                 flexWrap: 'wrap',
+                width: '90%',
                 gap: theme.core.space[3],
-                padding: theme.core.space[4],
+                margin: theme.core.space[4],
             }}
         >
             {(loading && (

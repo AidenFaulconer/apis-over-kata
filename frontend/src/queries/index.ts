@@ -1,11 +1,5 @@
 //REFERENCE: https://github.com/acro5piano/typed-graphqlify
-import {
-    query,
-    types,
-    alias,
-    mutation,
-    subscription,
-} from 'typed-graphqlify'
+import {query, types, alias, mutation, subscription} from 'typed-graphqlify'
 
 //GET
 export const getActorsQuery = query('GetActors', {
@@ -29,26 +23,32 @@ export const aggregateActorsRolesAndFilms = query('aggregateActorsRolesAndFilms'
     ],
 })
 
-export const searchActors = query(`searchActors(
+export const searchActors = query(
+    `searchActors(
     $firstname: String,
     $lastname: String,
     $middlename: String,
-)`, {
-    [alias('searchActors', `actor(
+)`,
+    {
+        [alias(
+            'searchActors',
+            `actor(
             where: { 
               lastname: {_ilike: $lastname}, 
               middlename: {_ilike: $middlename}, 
               firstname: {_ilike: $firstname}, 
             }
-    )`)]: 
-        [{
-            id: types.number,
-            firstname: types.string,
-            lastname: types.string,
-            middlename: types.string,
-        }],
-})
-
+    )`,
+        )]: [
+            {
+                id: types.number,
+                firstname: types.string,
+                lastname: types.string,
+                middlename: types.string,
+            },
+        ],
+    },
+)
 
 //CREATE UPDATE DELETE
 export const insertOneActor = mutation(
@@ -76,6 +76,29 @@ insertOneActor(
         },
     },
 )
+
+export const insertOneMessage = mutation(
+    `
+insertOneMesssage(
+  $senderId: uuid!,
+  $body: String!, 
+)`,
+    {
+        [alias(
+            'insertOneMessage',
+            `insert_message_one(
+              object: {
+                actor_id: $senderId, 
+                body: $body,  
+              }
+            )`,
+        )]: { 
+                actor_id: types.number,
+                body: types.string, 
+        },
+    },
+)
+
 export const deleteOneActor = mutation(
     `
 deleteOneActor(
@@ -97,6 +120,26 @@ deleteOneActor(
     },
 )
 
+export const deleteOneMessage = mutation(
+    `
+deleteOneMessgae(
+  $id: uuid!, 
+)`,
+    {
+        [alias(
+            'deleteOneMessgae',
+            `delete_messgae(
+              where: { 
+                id: {_eq: $id}, 
+              }
+            )`,
+        )]: {
+            returning: {
+                id: types.number,
+            },
+        },
+    },
+)
 
 export const updateOneActor = mutation(
     `
@@ -119,7 +162,6 @@ updateOneActor(
     },
 )
 
-
 //SUBSCRIPTIONS
 export const getActorsSubscription = subscription('SubscribeToActor', {
     [alias('actors', 'actor')]: [
@@ -130,6 +172,17 @@ export const getActorsSubscription = subscription('SubscribeToActor', {
             middlename: types.string,
             version: types.number,
             // updated_at: types.string,
+        },
+    ],
+})
+export const getMessagesSubscription = subscription('SubscribeToMessages', {
+    [alias('messages', 'message')]: [
+        {
+            body: types.string,
+            timestamp: types.string,
+            actor: {
+                firstname: types.string,
+            },
         },
     ],
 })

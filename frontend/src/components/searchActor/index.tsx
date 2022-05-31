@@ -62,7 +62,6 @@ export default function SearchActors({ fieldName = 'fullname', formName = 'userI
     const theme: Theme = useTheme();
 
     const [newActorInput, setFormInput, inputError] = useFormStore(formName, fieldName, true, 'fullName')
-    const [search, setSearch] = React.useState({})
 
     const partsOfName = ['firstname', 'middlename', 'lastname']
     const processInput = (input: string) => input.split(' ').reduce(
@@ -101,11 +100,10 @@ export default function SearchActors({ fieldName = 'fullname', formName = 'userI
                     onChange={e => {
                         e.preventDefault();
                         setFormInput(e.target.value)
-                        setSearch(processInput(newActorInput));
                         // alert(`you sent: ${JSON.stringify(processInput(newActorInput), null, 2)}`)
                     }}
                 />
-                <SearchResults searchVariables={search} />
+                <SearchResults searchVariables={processInput(newActorInput)} />
             </form>
 
         </div >
