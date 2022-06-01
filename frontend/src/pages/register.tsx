@@ -1,26 +1,58 @@
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 
-import { insertOneMessage } from '../queries';
+import { registerOne } from '../queries';
 import React, { DependencyList, useEffect } from "react";
 import { ReadonlyRecord } from 'readonly-types/dist';
 import { Theme } from "../types/theme";
-import { useTheme } from "../store/store";
+import { useTheme, useStore } from '../store/store';
 import { useFormStore, useTrackTime } from '../util/index';
 import { UserInputError } from "apollo-server-core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function AddActor(): JSX.Element {
+export default function RegisterPage(): JSX.Element {
 
-    const [userNameInput, setUserNameInput, userNameInputError] = useFormStore('loginInput', 'username', true, 'text')
+    const [userNameInput, setUserNameInput, userNameInputError] = useFormStore('loginInput', 'username', true, 'username')
     const [photoInput, setPhotoInput, photoInputError] = useFormStore('loginInput', 'profilePhoto', true, 'password')
-    const [bioInput, setBioInput, bioInputError] = useFormStore('loginInput', 'bio', true, 'password')
-    const [userTypeInput, setUserTypeInput, userTypeInputError] = useFormStore('loginInput', 'userType', true, 'password')
+    const [bioInput, setBioInput, bioInputError] = useFormStore('loginInput', 'bio', true, 'text')
+    const [userTypeInput, setUserTypeInput, userTypeInputError] = useFormStore('loginInput', 'userType', true, 'text')
     const [passwordInput, setPasswordInput, passwordInputError] = useFormStore('loginInput', 'password', true, 'password')
+    const inputErrors = [userNameInputError, photoInputError, bioInputError, userTypeInputError, passwordInputError]
 
-    const [login] = useMutation<typeof insertOneMessage.data>(gql(insertOneMessage.toString()));
+    const [register] = useMutation<typeof registerOne.data>(gql(registerOne.toString()));
 
-    const randomNumber = useTrackTime(0, 2500, (time) => Math.floor(time))
+
+    const navigate = useNavigate()
+    const randomNumber = useTrackTime(0, 2500, (time) => Math.floor(time + (Math.random() * 2)))
     const theme: Theme = useTheme();
+
+
+    const registerUser = React.useCallback(async () => {
+        const { data, errors } = await register({
+            variables: {
+                username: userNameInput,
+                bio: bioInput,
+                userType: userTypeInput,
+                password: passwordInput,
+            }
+        });
+        if (data?.registerOne?.id) {
+            alert('registration successful')
+            useStore.setState((state: any) => ({
+                ...state,
+                auth: {
+                    ...state.auth,
+                    isLoggedIn: true,
+                    user: {
+                        username: data.registerOne.username,
+                        id: data.registerOne.id,
+                    }
+                }
+            }))
+            navigate('/dashboard')
+        }
+        // alert(`registration failed ${errors}`)
+    }, [])
+
     return (
         <div style={{
             ...theme.element.variants.column,
@@ -37,6 +69,21 @@ export default function AddActor(): JSX.Element {
             border: theme.core.borders.primary,
             color: theme.core.colors.text,
         }}>
+            {inputErrors.map(err => err && <div style={{ color: theme.core.colors.danger }}>{err}</div>)}
+            <div
+                style={{
+                    height: '120px',
+                    width: '120px',
+                    color: theme.core.colors.text,
+                    background: theme.core.colors.background,
+                    border: theme.core.borders.secondary,
+                    borderRadius: '100%',
+                    backgroundImage: `url('${photoInput + randomNumber}')`,
+                    boxShadow: theme.core.shadows.small,
+                    backgroundPosition: 'center',
+                    backgroundSize: 'cover',
+                }}
+            />
             <form className="formInput"
                 style={{
                     width: '400px',
@@ -53,20 +100,6 @@ export default function AddActor(): JSX.Element {
                     }}
                     value={userNameInput}
                     onChange={e => setUserNameInput(e.target.value)}
-                />
-                <div
-                    style={{
-                        height: '120px',
-                        width: '120px',
-                        color: theme.core.colors.text,
-                        background: theme.core.colors.background,
-                        border: theme.core.borders.secondary,
-                        borderRadius: '100%',
-                        backgroundImage: `url('${photoInput + randomNumber}')`,
-                        boxShadow: theme.core.shadows.small,
-                        backgroundPosition: 'center',
-                        backgroundSize: 'cover',
-                    }}
                 />
                 <input
                     className="input"
@@ -93,7 +126,6 @@ export default function AddActor(): JSX.Element {
                     onChange={e => setBioInput(e.target.value)}
                 />
                 <select
-
                     className="input"
                     style={{
                         width: '105%',
@@ -122,19 +154,11 @@ export default function AddActor(): JSX.Element {
             <button
                 onClick={(e) => {
                     e.preventDefault();
-                    login({
-                        variables: {
-                            username: userNameInput,
-                            profilePhoto: photoInput,
-                            bio: bioInput,
-                            userType: userTypeInput,
-                            password: passwordInput,
-                        }
-                    });
+                    registerUser()
                 }}
-                disabled={(userNameInputError || passwordInputError)}
+                disabled={(inputErrors.every(error => error !== false))}
                 style={{
-                    ...(userNameInputError || passwordInputError) ? { opacity: .3 } : { opacity: 1 },
+                    ...(inputErrors.every(error => error === false)) ? { opacity: 1 } : { opacity: .3 },
                     borderRadius: theme.core.space[1],
                     padding: theme.core.space[3],
                     background: theme.core.colors.success,

@@ -1,19 +1,51 @@
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 
-import { insertOneMessage } from '../queries';
+import { loginOne } from '../queries';
 import React, { DependencyList, useEffect } from "react";
 import { ReadonlyRecord } from 'readonly-types/dist';
 import { Theme } from "../types/theme";
-import { useTheme } from "../store/store";
+import { useTheme, useStore } from '../store/store';
 import { useFormStore } from '../util/index';
 import { UserInputError } from "apollo-server-core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import LoadingProgress from "../components/progressload";
 
-export default function AddActor(): JSX.Element {
+//TODO: handle this with two factor authentication or O-Auth or another IAM platform
+export const HandleLogin = ({ variables }: { [key: string]: any }) => {
+    const navigate = useNavigate()
+    const loginAttemptResults = useQuery<typeof loginOne.data>(gql(loginOne.toString()), { variables });
 
-    const [userNameInput, setUserNameInput, userNameInputError] = useFormStore('loginInput', 'username', true, 'text')
+    if (loginAttemptResults.data?.loginOne) {
+        const [{ username, id }] = loginAttemptResults.data.loginOne;
+        console.log(loginAttemptResults.data)
+
+        alert('login successful')
+        useStore.setState((state: any) => ({
+            ...state,
+            auth: {
+                ...state.auth,
+                isLoggedIn: true,
+                user: {
+                    username: username,
+                    id: id,
+                }
+            }
+        }))
+        navigate('/dashboard')
+        return <></>
+    }
+    else {
+        return <LoadingProgress />
+    }
+}
+
+export default function LoginPage(): JSX.Element {
+    const [userNameInput, setUserNameInput, userNameInputError] = useFormStore('loginInput', 'username', true, 'username')
     const [passwordInput, setPasswordInput, passwordInputError] = useFormStore('loginInput', 'password', true, 'password')
-    const [login] = useMutation<typeof insertOneMessage.data>(gql(insertOneMessage.toString()));
+    const inputErrors = [userNameInputError, passwordInputError]
+
+    const [loggingIn, setLogginIn] = React.useState(false)
+
     const theme: Theme = useTheme();
     return (
         <div style={{
@@ -31,6 +63,7 @@ export default function AddActor(): JSX.Element {
             border: theme.core.borders.primary,
             color: theme.core.colors.text,
         }}>
+            {inputErrors.map(err => err && <div style={{ color: theme.core.colors.danger }}>{err}</div>)}
             <form className="formInput"
                 style={{
                     ...theme.element.variants.column,
@@ -59,12 +92,12 @@ export default function AddActor(): JSX.Element {
             </form>
             <button
                 onClick={(e) => {
+                    setLogginIn(true);
                     e.preventDefault();
-                    login({ variables: { password: passwordInput, username: userNameInput } });
                 }}
-                disabled={(userNameInputError || passwordInputError)}
+                disabled={(inputErrors.every(error => error !== false))}
                 style={{
-                    ...(userNameInputError || passwordInputError) ? { opacity: .3 } : { opacity: 1 },
+                    ...(inputErrors.every(error => error === false)) ? { opacity: 1 } : { opacity: .3 },
                     borderRadius: theme.core.space[1],
                     padding: theme.core.space[3],
                     background: theme.core.colors.success,
@@ -74,6 +107,9 @@ export default function AddActor(): JSX.Element {
                 }}
             >
                 💃 Login
+                {loggingIn &&
+                    <HandleLogin variables={{ username: userNameInput, password: passwordInput }} />
+                }
             </button>
             <p style={{ color: theme.core.colors.text }}>Don't have an account? <Link to="/register">Register</Link></p>
         </div>

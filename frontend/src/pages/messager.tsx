@@ -11,39 +11,11 @@ import { useStore, useTheme } from '../store/store'
 import { Theme } from '../types/theme'
 import SearchActor from '../components/searchActor'
 import { useDebounce, useTrackTime } from '../util'
-import ProgressLabel from 'react-progress-label'
 import MessageContainer from '../components/messenger'
 import { getMessagesSubscription } from '../queries';
 import AddMessage from '../components/messenger/addmessage';
+import ProgressLoader from '../components/progressload'
 
-
-export const LoadingProgress = ({ speed = 1 }: { [key: string]: number }): JSX.Element => {
-    //input a progress value that is a continuous sin from 0 100
-    const progress = useTrackTime(0, 10, (curTime: number) => {
-        const result = Math.abs(Math.sin(curTime / speed)) * 100
-        // debugger;
-        console.log(result)
-
-        return result
-    })
-
-    console.log(progress)
-    const theme: Theme = useTheme()
-    return (
-        <ProgressLabel
-            progress={progress}
-            fillColor="rgb(248,247,243)"
-            trackColor="#fff"
-            progressColor={theme.core.colors.success}
-            progressWidth={10}
-            trackWidth={16}
-            trackBorderWidth={1}
-            trackBorderColor="rgb(232,223,209)"
-            cornersWidth={5}
-            size={130}
-        />
-    )
-}
 
 export default function ActorsPage(): JSX.Element {
     const [actorData, setActorData] = React.useState({})
@@ -135,7 +107,7 @@ export default function ActorsPage(): JSX.Element {
                     {parseServerResponse(
                         null,
                         <>
-                            <LoadingProgress />
+                            <ProgressLoader />
                         </>,
                     )}
                 </div>

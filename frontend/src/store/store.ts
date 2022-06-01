@@ -68,7 +68,6 @@ export const useStore = create(
         const actions: StoreActions = {
             //for input states, inputs are at the top level, to hold new data, use this to modify those inputs state
             changeFormData: function (source: string, input: any): void {
-                console.log(source,input)
 
                 set((state: AppStore) => ({
                     ...state,

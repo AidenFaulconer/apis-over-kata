@@ -78,11 +78,14 @@ const client = new ApolloClient({
 //https://stackoverflow.com/questions/70358626/redirect-in-react-router-dom-v6
 const PrivateRoute = ({ ...props }): JSX.Element => {
   const location = useLocation();
+  React.useEffect(() => {
+    alert(props.isLoggedIn)
+  }, []);
   return props.isLoggedIn ? (
     <Outlet />
   ) : (
     <Navigate
-      to={`/login/${location.search}`}
+      to={`/login`}
       replace
       state={{ location }}
     />
@@ -107,34 +110,25 @@ export default function App() {
             minHeight: '100vh',
             width: '100%',
           }}>
+
             <Routes>
-              <Route path="/login" caseSensitive={false} element={
-                <Login />
-              } />
+              <Route path="/login" caseSensitive={false} element={<Login />} />
 
-              <Route path="/register" caseSensitive={false} element={
-                <Register />
-              } />
+              <Route path="/register" caseSensitive={false} element={<Register />} />
 
-              <Route path="dashboard" caseSensitive={false} element={
-                <PrivateRoute isLoggedIn={isLoggedIn} />
-              }>
+              <Route path="dashboard" caseSensitive={false} element={<PrivateRoute isLoggedIn={isLoggedIn} />}>
                 <Route path="dashboard" element={<Dashboard />} />
               </Route>
 
-              <Route path="actors" caseSensitive={false} element={
-                <PrivateRoute isLoggedIn={isLoggedIn} />
-              }>
+              <Route path="actors" caseSensitive={false} element={<PrivateRoute isLoggedIn={isLoggedIn} />}>
                 <Route path="actors" element={<Actors />} />
               </Route>
 
-              <Route path="messenger" caseSensitive={false} element={
-                <PrivateRoute isLoggedIn={isLoggedIn} />
-              }>
-                <Route path="actors" element={<Messenger />} />
+              <Route path="messenger" caseSensitive={false} element={<PrivateRoute isLoggedIn={isLoggedIn} />}>
+                <Route path="messenger" element={<Messenger />} />
               </Route>
-
             </Routes>
+
           </div>
         </Layout>
       </HistoryRouter>
@@ -142,13 +136,11 @@ export default function App() {
   );
 }
 
-
 //this component renders on page 'dashboard
 export const x = () => {
   return (
     <div>
       <h1>Dashboard</h1>
     </div>
-
   )
 }

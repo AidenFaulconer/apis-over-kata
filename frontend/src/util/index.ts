@@ -30,6 +30,15 @@ import { AppStore } from '../types/store';
 // Don’t call Hooks inside loops, conditions, or nested functions. Instead,
 // always use Hooks at the top level of your React function
 // ========================================================================== //
+ 
+
+export const callDelayedFunction = (fn: (...args: any[]) => void, delay: number) => {
+    let timeout: number;
+    return (...args: any[]) => {
+        clearTimeout(timeout);
+        timeout = window.setTimeout(() => fn(...args), delay);
+    };
+}
 
 // ========================================================================== //
 // Forms
@@ -120,12 +129,13 @@ useEffect(() => {
 // Global Store FORM handler **using zustand as global store**
 // ========================================================================== //
 const validationTypes: {[key:string]: yup.AnySchema} = {
-text: yup.string().required('Required'),
+username: yup.string().matches(/^[a-zA-Z0-9_.-]*$/, 'Only alphanumeric characters, underscores, dashes and periods are allowed').required('Username is required'),
+text: yup.string().required('Field Required'),
 required: yup.string().required('Required'),
 selection: yup.string().required('Please select an option'),
 fullName: yup.string().required('Full Name is required'),
 email: yup.string().email('Invalid email address').required('Email is required'),
-password: yup.string().required('Password is required'),
+password: yup.string().min(8, 'Password must be at least 8 characters').matches(/[a-zA-Z]/, 'Password must contain at least one letter').matches(/[0-9]/, 'Password must contain at least one number').required('Password is required'),
 confirmPassword: yup.string().required('Confirm Password is required'),
 phone: yup.string().required('Phone is required'),
 acceptTerms: yup.boolean().oneOf([true], 'You must accept the terms and conditions'),
@@ -143,7 +153,7 @@ const [error, setError] = useState(false);
 const changeFormData = useStore((state:any) => state.actions.changeFormData);
 
 useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log(`New Form Input: ${input} for form ${formName}`);
+    // if (process.env.NODE_ENV === 'development') console.log(`New Form Input: ${input} for form ${formName}`);
 
     // test input for errors
     validationTypes[validationType].validate(input, { abortEarly: false, strict: true })
@@ -167,7 +177,7 @@ export const useFormStoreNoValidation = (formName:string = 'testForm', fieldName
     const [input, setFormInput] = useState(stateDefaultValue ? useStore((state: any) => state[formName][fieldName]) : '');
     const changeFormData = useStore((state: any) => state.actions.changeFormData);
     useEffect(() => {
-        if (process.env.NODE_ENV === 'development') console.log(`New Form Input: ${input} for form ${formName}`);
+        // if (process.env.NODE_ENV === 'development') console.log(`New Form Input: ${input} for form ${formName}`);
         changeFormData(formName,{ [fieldName]: input });
     }, [input]);
 

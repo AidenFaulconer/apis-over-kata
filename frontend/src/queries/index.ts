@@ -5,8 +5,7 @@ import {query, types, alias, mutation, subscription} from 'typed-graphqlify'
 
 //Actors
 export const getActorsQuery = query('GetActors', {
-    [alias('actor', 'actor')]: [
-        {
+    [alias('actor', 'actor')]: [{
             id: types.string,
             name: types.string,
             lastName: types.string,
@@ -15,8 +14,7 @@ export const getActorsQuery = query('GetActors', {
     ],
 })
 export const aggregateActorsRolesAndFilms = query('aggregateActorsRolesAndFilms', {
-    [alias('getActors', 'actor')]: [
-        {
+    [alias('getActors', 'actor')]: [{
             lastname: types.string,
             id: types.number,
             firstname: types.string,
@@ -41,8 +39,7 @@ export const searchActors = query(
               firstname: {_ilike: $firstname}, 
             }
     )`,
-        )]: [
-            {
+        )]: [{
                 id: types.number,
                 firstname: types.string,
                 lastname: types.string,
@@ -51,6 +48,33 @@ export const searchActors = query(
         ],
     },
 )
+
+//Authentication
+export const loginOne = query(
+    `loginOne(
+    $password: String,
+    $username: String,
+)`,
+    {
+        [alias(
+            'loginOne',
+            `user(
+            where: { 
+              username: {eq: $username}, 
+              password: {eq: $password}, 
+            }
+    )`,
+        )]: [{
+                // profile_photo: types.string, 
+                id: types.number,
+                password: types.string,
+                username: types.string,
+            },
+        ],
+    },
+)
+
+
 
 //CREATE UPDATE DELETE
 
@@ -173,7 +197,35 @@ deleteOneMessgae(
 
 
 //Authentication
+export const registerOne = mutation(
+    `
+registerOne(
+  $bio: String,
+  $username: String!,
+  $password: String!, 
+  $userType: String!
+)`,
+    {
+        [alias(
+            'registerOne',
+            `insert_user_one(
+                object: {
+                username: $username,
+                bio: $bio,  
+                user_type: $userType, 
+                password: $password
+              }
+            )`,
+        )]: { 
+            id: types.number,
+            username: types.string,
+                // profile_photo: types.string, 
+        },
+    },
+)
 
+
+//Messages
 
 //SUBSCRIPTIONS
 
