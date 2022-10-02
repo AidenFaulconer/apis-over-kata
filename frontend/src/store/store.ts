@@ -133,6 +133,8 @@ export const useStore = create(
             },
             setMessages: async function <NewMessageInput>(newMessage: NewMessageInput): Promise<void> {
                 set((state: AppStore) => ({
+
+                    
                     ...state,
                     messaging: {
                         ...state.messaging,

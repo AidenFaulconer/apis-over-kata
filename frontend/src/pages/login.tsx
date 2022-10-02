@@ -5,9 +5,10 @@ import { ReadonlyRecord } from 'readonly-types/dist';
 import { Theme } from "../types/theme";
 import { useTheme, useStore } from '../store/store';
 import { useFormStore } from '../util/index';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import LoadingProgress from "../components/progressload";
 import { useLazyQuery } from "@apollo/react-hoc";
+import produce from "immer";
 
 export default function LoginPage(): JSX.Element {
     const [userNameInput, setUserNameInput, userNameInputError] = useFormStore('loginInput', 'username', true, 'username')
@@ -18,24 +19,23 @@ export default function LoginPage(): JSX.Element {
         gql(loginOne.toString()),
     )
 
-    const navigate = useNavigate()
     const theme: Theme = useTheme();
 
     if (data?.loginOne[0]) {
-        const [{ username, id }] = data?.loginOne;
+        const [{ username, id, profile_picture, user_type, bio }] = data?.loginOne;
 
-        useStore.setState((state: any) => ({
-            ...state,
-            auth: {
-                ...state.auth,
-                isLoggedIn: true,
-                user: {
+        useStore.setState(
+            produce((state: any) => {
+                state.auth.isLoggedIn = true;
+                state.auth.user = {
                     username,
                     id,
+                    profile_picture,
+                    user_type, bio
                 }
-            }
-        }));
-        navigate('/dashboard');
+            }));
+
+        return <><Navigate to="/dashboard" replace /></>
     }
 
 

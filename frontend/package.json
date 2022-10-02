@@ -26,6 +26,7 @@
     "emoji-picker-react": "^3.5.1",
     "graphql": "^16.5.0",
     "graphql-ws": "^5.8.2",
+    "immer": "^9.0.15",
     "lodash-es": "^4.17.21",
     "oaf-react-router": "^3.0.0",
     "rc-table": "^7.24.2",

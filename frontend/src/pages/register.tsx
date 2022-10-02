@@ -7,8 +7,9 @@ import { Theme } from "../types/theme";
 import { useTheme, useStore } from '../store/store';
 import { useFormStore, useTrackTime } from '../util/index';
 import { UserInputError } from "apollo-server-core";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import LoadingProgress from "../components/progressload";
+import produce from "immer";
 
 export default function RegisterPage(): JSX.Element {
 
@@ -23,26 +24,23 @@ export default function RegisterPage(): JSX.Element {
         gql(registerOne.toString()),
     );
 
-    const navigate = useNavigate()
     const randomNumber = useTrackTime(0, 2500, (time) => Math.floor(time + (Math.random() * 2)))
     const theme: Theme = useTheme();
 
     if (data?.registerOne) {
-        const { id, username } = data?.registerOne;
+        const { id, username, profile_picture, user_type, bio } = data?.registerOne;
 
-        useStore.setState((state: any) => ({
-            ...state,
-            auth: {
-                ...state.auth,
-                isLoggedIn: true,
-                user: {
-                    username,
-                    id,
-                }
+        useStore.setState(produce((state: any) => {
+            state.auth.isLoggedIn = true;
+            state.auth.user = {
+                username,
+                id,
+                profile_picture,
+                user_type, bio
             }
-        }));
-        navigate('/dashboard');
-        return <></>
+        }
+        ));
+        return <><Navigate to="/dashboard" /></>
     }
 
     return (

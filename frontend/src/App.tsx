@@ -38,7 +38,6 @@ const client = new ApolloClient({
 
 export default function App() {
   const theme: Theme = useTheme();
-  const isLoggedIn = useStore((state: any) => state.auth.isLoggedIn)
 
   return (
     <ApolloProvider client={client} >

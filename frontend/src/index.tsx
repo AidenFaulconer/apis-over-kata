@@ -9,7 +9,7 @@ import Dashboard from './pages/dashboard';
 import Actors from "./pages/actors"
 import Messenger from "./pages/messager"
 
-import { Navigate, Outlet, unstable_HistoryRouter as HistoryRouter, useLocation, Route, Routes, BrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet, unstable_HistoryRouter as HistoryRouter, useLocation, Route, Routes, BrowserRouter, Link } from 'react-router-dom';
 import { createBrowserHistory } from "history";
 import { wrapHistory } from "oaf-react-router";
 
@@ -41,66 +41,96 @@ const settings = {
 wrapHistory(history, settings);
 
 //https://stackoverflow.com/questions/70358626/redirect-in-react-router-dom-v6
-const PrivateRoute = ({ ...props }): JSX.Element => {
+const AuthWrapper = ({ ...props }): JSX.Element => {
   const location = useLocation();
+  const isLoggedIn = useStore((state: any) => state.auth.isLoggedIn)
+  // const token = !!JSON.parse(localStorage.getItem("token"));
   React.useEffect(() => {
-    alert(props.isLoggedIn)
+    alert(isLoggedIn)
   }, []);
-  return props.isLoggedIn ? (
+  return isLoggedIn ? (
     <Outlet />
   ) : (
     <Navigate
       to={`/login`}
       replace
-      state={{ location }}
+      state={{ from: location }}
+    />
+  )
+};
+const AdminRoute = ({ ...props }): JSX.Element => {
+  const location = useLocation();
+  const isLoggedIn = useStore((state: any) => state.auth.isLoggedIn)
+  // const token = !!JSON.parse(localStorage.getItem("token"));
+  React.useEffect(() => {
+    alert(isLoggedIn)
+  }, []);
+  //outlet is anything nested within this route
+  return isLoggedIn ? (
+    <Outlet />
+  ) : (
+    <Navigate
+      to={`/dashboard`}
+      replace
+      state={{ from: location }}
     />
   )
 };
 
 const AppRouter = () => {
   const theme: Theme = useTheme();
-  const isLoggedIn = useStore((state: any) => state.auth.isLoggedIn)
 
   return (
     <React.StrictMode>
-      {/* <HistoryRouter history={history}> */}
-      <BrowserRouter>
+      <HistoryRouter history={history}>
+        {/* <BrowserRouter> */}
         <Routes>
           <Route path="/" caseSensitive={false} element={<App />}>
-            <Route path="login" caseSensitive={false} element={<Login />} />
 
+            {/* login and registration */}
+            <Route path="" caseSensitive={false} element={<>
+              <Link to="/login" replace>login</Link>
+              or
+              <Link to="/register" replace>register</Link>
+
+            </>} />
+            <Route path="login" caseSensitive={false} element={<Login />} />
             <Route path="register" caseSensitive={false} element={<Register />} />
 
-            <Route path="dashboard" caseSensitive={false} element={<PrivateRoute isLoggedIn={isLoggedIn} />}>
+            {/* app */}
+            <Route element={<AuthWrapper />}>
               <Route path="dashboard" element={<Dashboard />} />
-            </Route>
-
-            <Route path="actors" caseSensitive={false} element={<PrivateRoute isLoggedIn={isLoggedIn} />}>
               <Route path="actors" element={<Actors />} />
               {/*
               note: this will also render <Actors />
               now in the url under actorId we can get info to pass to a cutstom component to view more details at, use useParams(); or useSearchParams();
               <Route path=":actorId" element={<Actor />} /> 
-              */}
+            */}
+            </Route>
+            <Route path="messenger" element={<Messenger />} />
+
+
+            {/* admin only */}
+            <Route element={<AdminRoute />}>
+
             </Route>
 
-            <Route path="messenger" caseSensitive={false} element={<PrivateRoute isLoggedIn={isLoggedIn} />}>
-              <Route path="messenger" element={<Messenger />} />
-            </Route>
-
+            {/* everything else  */}
             <Route
               path="*"
               element={
                 <main style={{ padding: "1rem" }}>
                   <p>There's nothing here!</p>
+                  <Link to="/" replace>Go back</Link>
                 </main>
               }
             />
           </Route>
+
         </Routes>
-        {/* </HistoryRouter > */}
-      </BrowserRouter >
-    </React.StrictMode>
+      </HistoryRouter >
+      {/* </BrowserRouter > */}
+    </React.StrictMode >
   );
 }
 

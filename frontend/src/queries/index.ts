@@ -66,10 +66,12 @@ export const loginOne = query(
             }
     )`,
         )]: [{
-                // profile_photo: types.string, 
                 id: types.number,
                 password: types.string,
                 username: types.string,
+                profile_picture: types.string,
+                user_type: types.string,
+                bio: types.string,
             },
         ],
     },
@@ -220,6 +222,10 @@ registerOne(
         )]: { 
             id: types.number,
             username: types.string,
+            
+                profile_picture: types.string,
+                user_type: types.string,
+                bio: types.string,
                 // profile_photo: types.string, 
         },
     },

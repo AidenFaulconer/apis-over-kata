@@ -3,11 +3,13 @@ import React, { DependencyList, useEffect, useState } from "react";
 import { useStore, useTheme } from '../store/store';
 import { Theme } from "../types/theme";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import produce from "immer";
 
 
 export const UserProfile = function ({ searchVariables }: { [key: string]: {}; }): JSX.Element {
-    const currentUser = useStore((state: any) => state.user.currentUser);
+    const currentUser = useStore((state: any) => state.auth.user);
+
     const theme: Theme = useTheme();
     return (
         <div>
@@ -18,13 +20,24 @@ export const UserProfile = function ({ searchVariables }: { [key: string]: {}; }
                 <div style={{
                     borderRadius: '100%',
                     display: 'block',
-                    backgroundImage: `url(${currentUser.avatar})`,
+                    backgroundImage: `url(${currentUser.profile_picture})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     width: '100px',
                     height: '100px',
                 }} />
-                {currentUser.name}
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: theme.core.space[1],
+                }}>
+                    <p>
+                        {currentUser.username}
+                    </p>
+                    <p>
+                        {currentUser.user_type}
+                    </p>
+                </div>
             </div>
         </div>
     );
@@ -32,6 +45,17 @@ export const UserProfile = function ({ searchVariables }: { [key: string]: {}; }
 
 export default function Header() {
     const theme: Theme = useTheme();
+    const isLoggedIn = useStore((state: any) => state.auth.isLoggedIn)
+    const navigate = useNavigate();
+
+    const logout = () => {
+        useStore.setState(produce((state: any) => {
+            state.auth.isLoggedIn = false;
+            state.auth.user = {}
+        }));
+        navigate("/");
+    }
+
     return (
         <div style={{
             ...theme.element.variants.row,
@@ -70,7 +94,29 @@ export default function Header() {
                     to={'./actors'}
                     style={{ textDecoration: 'none' }}
                 >Actors</Link>
+
+
+                {isLoggedIn && <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: theme.core.space[2] }}>
+                    <button
+                        style={{
+                            borderRadius: theme.core.space[1],
+                            padding: theme.core.space[3],
+                            height: '50px',
+                            background: theme.core.colors.success,
+                            cursor: 'pointer',
+                            color: theme.core.colors.textSecondary,
+                            boxShadow: "0px 2.5px 7.5px green",
+                        }}
+                        onClick={() => {
+                            logout();
+                        }}
+                    >Logout</button>
+                    <UserProfile />
+                </div>
+                }
             </div>
+
+
         </div >
     )
 }
