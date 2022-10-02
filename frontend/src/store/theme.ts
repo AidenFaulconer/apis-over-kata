@@ -309,6 +309,9 @@ export const elementTheme: ElementTheme = {
         },
         buttons: {
             primary: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: coreTheme.space[3],
                 color: 'background',
                 fontSize: coreTheme.fonts.fontSizes[3],
                 bg: coreTheme.colors.primary,
@@ -317,6 +320,9 @@ export const elementTheme: ElementTheme = {
                 },
             },
             outline: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: coreTheme.space[3],
                 color: coreTheme.colors.primary,
                 fontSize: coreTheme.fonts.fontSizes[3],
                 bg: 'transparent',
@@ -328,6 +334,9 @@ export const elementTheme: ElementTheme = {
                 },
             },
             secondary: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: coreTheme.space[3],
                 color: 'background',
                 fontSize: coreTheme.fonts.fontSizes[3],
                 bg: coreTheme.colors.secondary,

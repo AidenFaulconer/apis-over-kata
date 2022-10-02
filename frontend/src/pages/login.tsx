@@ -1,52 +1,44 @@
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 
 import { loginOne } from '../queries';
-import React, { DependencyList, useEffect } from "react";
 import { ReadonlyRecord } from 'readonly-types/dist';
 import { Theme } from "../types/theme";
 import { useTheme, useStore } from '../store/store';
 import { useFormStore } from '../util/index';
-import { UserInputError } from "apollo-server-core";
 import { Link, useNavigate } from "react-router-dom";
 import LoadingProgress from "../components/progressload";
-
-//TODO: handle this with two factor authentication or O-Auth or another IAM platform
-export const HandleLogin = ({ variables }: { [key: string]: any }) => {
-    const navigate = useNavigate()
-    const loginAttemptResults = useQuery<typeof loginOne.data>(gql(loginOne.toString()), { variables });
-
-    if (loginAttemptResults.data?.loginOne) {
-        const [{ username, id }] = loginAttemptResults.data.loginOne;
-        console.log(loginAttemptResults.data)
-
-        alert('login successful')
-        useStore.setState((state: any) => ({
-            ...state,
-            auth: {
-                ...state.auth,
-                isLoggedIn: true,
-                user: {
-                    username: username,
-                    id: id,
-                }
-            }
-        }))
-        navigate('/dashboard')
-        return <></>
-    }
-    else {
-        return <LoadingProgress />
-    }
-}
+import { useLazyQuery } from "@apollo/react-hoc";
 
 export default function LoginPage(): JSX.Element {
     const [userNameInput, setUserNameInput, userNameInputError] = useFormStore('loginInput', 'username', true, 'username')
     const [passwordInput, setPasswordInput, passwordInputError] = useFormStore('loginInput', 'password', true, 'password')
     const inputErrors = [userNameInputError, passwordInputError]
 
-    const [loggingIn, setLogginIn] = React.useState(false)
+    const [login, { loading, error, data }] = useLazyQuery<typeof loginOne.data>(
+        gql(loginOne.toString()),
+    )
 
+    const navigate = useNavigate()
     const theme: Theme = useTheme();
+
+    if (data?.loginOne[0]) {
+        const [{ username, id }] = data?.loginOne;
+
+        useStore.setState((state: any) => ({
+            ...state,
+            auth: {
+                ...state.auth,
+                isLoggedIn: true,
+                user: {
+                    username,
+                    id,
+                }
+            }
+        }));
+        navigate('/dashboard');
+    }
+
+
     return (
         <div style={{
             ...theme.element.variants.column,
@@ -63,7 +55,11 @@ export default function LoginPage(): JSX.Element {
             border: theme.core.borders.primary,
             color: theme.core.colors.text,
         }}>
+
             {inputErrors.map(err => err && <div style={{ color: theme.core.colors.danger }}>{err}</div>)}
+            {error && <div style={{ color: theme.core.colors.danger }}>{error.message}</div>}
+            {data && <div style={{ color: theme.core.colors.danger }}>No user found with given email and password</div>}
+
             <form className="formInput"
                 style={{
                     ...theme.element.variants.column,
@@ -92,8 +88,13 @@ export default function LoginPage(): JSX.Element {
             </form>
             <button
                 onClick={(e) => {
-                    setLogginIn(true);
                     e.preventDefault();
+                    login({
+                        variables: {
+                            username: userNameInput,
+                            password: passwordInput
+                        }
+                    })
                 }}
                 disabled={(inputErrors.every(error => error !== false))}
                 style={{
@@ -107,9 +108,7 @@ export default function LoginPage(): JSX.Element {
                 }}
             >
                 💃 Login
-                {loggingIn &&
-                    <HandleLogin variables={{ username: userNameInput, password: passwordInput }} />
-                }
+                {loading && <LoadingProgress />}
             </button>
             <p style={{ color: theme.core.colors.text }}>Don't have an account? <Link to="/register">Register</Link></p>
         </div>

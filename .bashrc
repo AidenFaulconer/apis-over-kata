@@ -1,0 +1,1 @@
+export KUBECONFIG=~/.kube/<kubeconfig_env>.yml

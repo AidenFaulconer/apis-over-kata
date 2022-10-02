@@ -67,7 +67,7 @@ const mockData: DefaultRecordType[] = [
     },
 ]
 
-export default function ActorsPage() {
+export default function Dashboard() {
     const [actorData, setActorData] = React.useState({
         data: mockData,
         columns: mockColumns,
@@ -85,6 +85,9 @@ export default function ActorsPage() {
     // Unsubscribe listeners
     // actorsSub()
 
+    if (error) {
+        // console.log(JSON.stringify(error, null, 2))
+    }
     if (data) {
         console.log(JSON.stringify(data, null, 2))
     }

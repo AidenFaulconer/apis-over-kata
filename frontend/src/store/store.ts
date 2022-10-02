@@ -1,10 +1,6 @@
-import React from 'react'
 import create, {StateCreator} from 'zustand'
 import {persist} from 'zustand/middleware'
-import {coreTheme, elementTheme} from './theme'
-import depeMerge from '@mui/utils/deepmerge'
-import {getActorsSubscription} from '../queries/index'
-import {gql, useSubscription} from '@apollo/client'
+import {coreTheme, elementTheme} from './theme' 
 import deepmerge from '@mui/utils/deepmerge'
 import {StoreActions} from '../types/store'
 import {

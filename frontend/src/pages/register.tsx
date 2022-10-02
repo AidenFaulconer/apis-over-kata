@@ -1,13 +1,14 @@
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 
 import { registerOne } from '../queries';
-import React, { DependencyList, useEffect } from "react";
+import React, { DependencyList, useEffect, useCallback } from "react";
 import { ReadonlyRecord } from 'readonly-types/dist';
 import { Theme } from "../types/theme";
 import { useTheme, useStore } from '../store/store';
 import { useFormStore, useTrackTime } from '../util/index';
 import { UserInputError } from "apollo-server-core";
 import { Link, useNavigate } from "react-router-dom";
+import LoadingProgress from "../components/progressload";
 
 export default function RegisterPage(): JSX.Element {
 
@@ -18,40 +19,31 @@ export default function RegisterPage(): JSX.Element {
     const [passwordInput, setPasswordInput, passwordInputError] = useFormStore('loginInput', 'password', true, 'password')
     const inputErrors = [userNameInputError, photoInputError, bioInputError, userTypeInputError, passwordInputError]
 
-    const [register] = useMutation<typeof registerOne.data>(gql(registerOne.toString()));
-
+    const [register, { loading, error, data }] = useMutation<typeof registerOne.data>(
+        gql(registerOne.toString()),
+    );
 
     const navigate = useNavigate()
     const randomNumber = useTrackTime(0, 2500, (time) => Math.floor(time + (Math.random() * 2)))
     const theme: Theme = useTheme();
 
+    if (data?.registerOne) {
+        const { id, username } = data?.registerOne;
 
-    const registerUser = React.useCallback(async () => {
-        const { data, errors } = await register({
-            variables: {
-                username: userNameInput,
-                bio: bioInput,
-                userType: userTypeInput,
-                password: passwordInput,
-            }
-        });
-        if (data?.registerOne?.id) {
-            alert('registration successful')
-            useStore.setState((state: any) => ({
-                ...state,
-                auth: {
-                    ...state.auth,
-                    isLoggedIn: true,
-                    user: {
-                        username: data.registerOne.username,
-                        id: data.registerOne.id,
-                    }
+        useStore.setState((state: any) => ({
+            ...state,
+            auth: {
+                ...state.auth,
+                isLoggedIn: true,
+                user: {
+                    username,
+                    id,
                 }
-            }))
-            navigate('/dashboard')
-        }
-        // alert(`registration failed ${errors}`)
-    }, [])
+            }
+        }));
+        navigate('/dashboard');
+        return <></>
+    }
 
     return (
         <div style={{
@@ -69,7 +61,10 @@ export default function RegisterPage(): JSX.Element {
             border: theme.core.borders.primary,
             color: theme.core.colors.text,
         }}>
+
             {inputErrors.map(err => err && <div style={{ color: theme.core.colors.danger }}>{err}</div>)}
+            {error && <div style={{ color: theme.core.colors.danger }}>{error.message}</div>}
+
             <div
                 style={{
                     height: '120px',
@@ -154,7 +149,14 @@ export default function RegisterPage(): JSX.Element {
             <button
                 onClick={(e) => {
                     e.preventDefault();
-                    registerUser()
+                    register({
+                        variables: {
+                            username: userNameInput,
+                            bio: bioInput,
+                            userType: userTypeInput,
+                            password: passwordInput,
+                        }
+                    });
                 }}
                 disabled={(inputErrors.every(error => error !== false))}
                 style={{
@@ -168,6 +170,7 @@ export default function RegisterPage(): JSX.Element {
                 }}
             >
                 💃 Register
+                {loading && <LoadingProgress />}
             </button>
             <p style={{ color: theme.core.colors.text }}>Already have an account? <Link to="/login">Login</Link></p>
         </div>

@@ -13,6 +13,7 @@ export const getActorsQuery = query('GetActors', {
         },
     ],
 })
+
 export const aggregateActorsRolesAndFilms = query('aggregateActorsRolesAndFilms', {
     [alias('getActors', 'actor')]: [{
             lastname: types.string,
@@ -60,8 +61,8 @@ export const loginOne = query(
             'loginOne',
             `user(
             where: { 
-              username: {eq: $username}, 
-              password: {eq: $password}, 
+              username: {_eq: $username}, 
+              password: {_eq: $password}, 
             }
     )`,
         )]: [{
