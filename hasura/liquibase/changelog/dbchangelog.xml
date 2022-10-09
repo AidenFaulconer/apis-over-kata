@@ -137,7 +137,7 @@
         </createTable>
 
         <createTable tableName="post">
-            <column defaultValue="gen_random_uuid ()" name="id" type="UUID">
+            <column defaultValue="gen_random_uuid()" name="id" type="UUID">
                 <constraints nullable="false" primaryKey="true" />
             </column>
 
