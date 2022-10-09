@@ -44,7 +44,7 @@ const loadStore = (): AppStore => {
     return appStore !== null ? appStore[0] : JSON.parse(appStore[0])
 }
 const saveOnClose = (storeRef: AppStore): void => {
-    window.addEventListener('close', (e: Event) => {
+    typeof window !== "undefined" && window.addEventListener('close', (e: Event) => {
         saveStore(storeRef)
     })
 }
@@ -159,8 +159,8 @@ export const useStore = create(
             isDesktop: false,
             isLargeDesktop: false,
 
-            width: window.innerWidth,
-            height: window.innerHeight,
+            width: typeof window !== "undefined" && window.innerWidth,
+            height: typeof window !== "undefined" && window.innerHeight,
 
             light: {
                 brightness: 0,

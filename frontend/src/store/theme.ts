@@ -50,8 +50,8 @@ export const dimensions = {
     zIndexTooltip: '10',
     zIndexPopover: '10',
     dimensionShadows: getShadows(
-        window.innerWidth,
-        window.innerHeight,
+        typeof window !== "undefined" && window.innerWidth,
+        typeof window !== "undefined" && window.innerHeight,
         randomLight(),
     ),
 };

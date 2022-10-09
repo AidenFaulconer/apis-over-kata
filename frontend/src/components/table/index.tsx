@@ -4,7 +4,6 @@ import { ReadonlyRecord } from 'readonly-types/dist';
 import { ColumnsType, DefaultRecordType, TableLayout } from 'rc-table/lib/interface';
 import { TableProps } from 'rc-table/lib/Table';
 
-import './table.css';
 import { Theme } from '../../types/theme';
 import { useTheme } from '../../store/store';
 

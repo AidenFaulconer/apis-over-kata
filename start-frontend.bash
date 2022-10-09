@@ -1,2 +1,1 @@
-cd ./frontend &&
-npm run start 
+cd ./frontend && npm run start || npm run build && npm run start

@@ -36,7 +36,7 @@ export const callDelayedFunction = (fn: (...args: any[]) => void, delay: number)
     let timeout: number;
     return (...args: any[]) => {
         clearTimeout(timeout);
-        timeout = window.setTimeout(() => fn(...args), delay);
+        timeout = typeof window !== "undefined" && window.setTimeout(() => fn(...args), delay);
     };
 }
 
@@ -307,7 +307,7 @@ export const useLocalStorage = (key: string, initialValue: undefined) => {
 const [storedValue, setStoredValue] = useState(() => {
     try {
         // Get from local storage by key
-        const item = window.localStorage.getItem(key);
+        const item = typeof window !== "undefined" && window.localStorage.getItem(key);
         // Parse stored json or if none return initialValue
         return item ? JSON.parse(item) : initialValue;
     } catch (error) {
@@ -325,7 +325,7 @@ const setLocalStorageValue = (value: (arg0: any) => any) => {
         // Save state
         setStoredValue(valueToStore);
         // Save to local storage
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        typeof window !== "undefined" && window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
         // A more advanced implementation would handle the error case
         console.log(error);
@@ -351,11 +351,11 @@ useEffect(() => {
         });
     }
     // Add event listener
-    window.addEventListener('resize', handleResize);
+    typeof window !== "undefined" && window.addEventListener('resize', handleResize);
     // Call handler right away so state gets updated with initial window size
     handleResize();
     // Remove event listener on cleanup
-    return () => window.removeEventListener('resize', handleResize);
+    return () => typeof window !== "undefined" && window.removeEventListener('resize', handleResize);
 }, []); // Empty array ensures that effect is only run on mount
 return windowSize;
 };
@@ -375,8 +375,8 @@ const handleResize = () => {
 };
 
 useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    typeof window !== "undefined" && window.addEventListener('resize', handleResize);
+    return () => typeof window !== "undefined" && window.removeEventListener('resize', handleResize);
 }, []);
 
 useLayoutEffect(() => {
